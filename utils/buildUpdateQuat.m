@@ -3,6 +3,7 @@ function updateQuat = buildUpdateQuat(deltaTheta)
 % Builds the update quaternion from the minimally parametrized update
 % See Indirect Kalman Filter for 3D Attitude Estimation (Roumeliotis)
 %
+%% 从最小参数化更新建立更新四元数参见间接卡尔曼滤波器进行三维姿态估计（Roumeliotis）
 
     deltaq = 0.5 * deltaTheta;
     

@@ -16,7 +16,7 @@ function [H,detZ] = calH(q,measurements_k)
            2*b(2)*q(3),                2*b(2)*q(4)-4*b(4)*q(2),	   2*b(2)*q(1)-4*b(4)*q(3),        2*b(2)*q(2)];
     Hx = [Ha, zeros(3,3)
           Hm, zeros(3,3)];
-    %Hx = [Ha, zeros(3,3)];
+%     Hx = [Ha, zeros(3,3)];
     Q_detTheta  = [-q(2),    -q(3),      -q(4)
                     q(1),    -q(4),       q(3) 
                     q(4),     q(1),      -q(2) 

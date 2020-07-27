@@ -6,7 +6,8 @@ function [errorState_prop] = propagateErrorStateAndCovar(wb,imuErrorStates_k, me
     errorState_prop.det_theta = det_x_prop(1:3);
     errorState_prop.det_wb    = det_x_prop(4:6);
     %Propagate Convar
-    Qi = noiseParams.Q*measurements_k.dt;
+%     Qi = noiseParams.Q * measurements_k.dt;
+    Qi = noiseParams.Q * diag([ones(1,3).*measurements_k.dt^2   ,    ones(1,3).*measurements_k.dt]);
     Fi = eye(6);
     errorState_prop.P = Fx *  imuErrorStates_k.P * Fx' + Fi * Qi * Fi'; 
     errorState_prop.P = enforcePSD(errorState_prop.P);%this is important,it removes the NAN problem successfully~

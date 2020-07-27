@@ -2,18 +2,18 @@
 % Extend Kalman Filter for attitude determination
 % 使用 NED 为导航坐标系
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc;
+% clc;
 clear;
 close all;   
-dataDir = '../datasets';
-fileName = 'NAV'; 
-Data = importdata(sprintf('%s/%s.mat',dataDir,fileName));
+dataDir = '';
+fileName = 'NAV_1'; 
+Data = importdata(sprintf('%s.mat',fileName));
 addpath('utils');
 tic
 gx=Data(:,27); %%陀螺仪数据
 gy=Data(:,28); 
 gz=Data(:,29); 
-ax=Data(:,9); %%加速度计数据
+ax=Data(:,9);    %%加速度计数据
 ay=Data(:,10); 
 az=Data(:,11); 
 mx=Data(:,15); %%磁强计数据
@@ -127,6 +127,20 @@ pitchEKF(L)=pitchEKF(L-1);
 save t_e;
 
 %% ==========================plot======================== %%
+rollRef = Data(:,30)*57.3;
+pitchRef = Data(:,31)*57.3;
+yawRef = Data(:,32)*57.3;
+figure;
+subplot(3,1,1)
+plot(rollEKF' - rollRef);
+subplot(3,1,2)
+plot(pitchEKF' - pitchRef);
+subplot(3,1,3)
+plot(yawEKF' - yawRef);
+legend 1 2 
+
+
+
 figure('Name', 'Roll Angle');
 hold on;
 plot(Time,rollEKF,'k',Time,Data(:,30)*57.3,'b') ;

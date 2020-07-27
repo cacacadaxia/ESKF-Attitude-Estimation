@@ -28,7 +28,7 @@ hold off;
 
  %% ==========================plot error======================== %%
  rotLim = [-5 5];
-  rotLimYaw = [-5 5];
+rotLimYaw = [-5 5];
 % Rotation Errors
 figure
 subplot(3,1,1)

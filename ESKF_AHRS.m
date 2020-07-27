@@ -1,12 +1,12 @@
 clear;
 close all;
-clc;
+% clc;
 addpath('utils');
 tic
 %% ==========================Input Data======================== %%
-dataDir = '../datasets';
+dataDir = '';
 fileName = 'NAV_1'; 
-Data = importdata(sprintf('%s/%s.mat',dataDir,fileName));
+Data = importdata(sprintf('%s.mat',fileName));
 length = size(Data,1);
 dataStructureDef;
 %% ==========================Initial State======================== %%
@@ -19,6 +19,7 @@ an_var  = 1e-3 * ones(1,3);               % acc var
 mn_var  = 1e-4 * ones(1,3);               % mag var
 noiseParams.Q = diag([wn_var, wbn_var]); 
 noiseParams.R = diag([an_var, mn_var]); 
+% noiseParams.R = diag([an_var]);
 %set uo P initial value
 q_var_init = 1e-5 * ones(1,3);            % init rot var
 wb_var_init = 1e-7 * ones(1,3);           % init gyro bias var
@@ -41,10 +42,12 @@ for state_k = 1:length-1
     %Calculate H and detZ = y-h(det_x)
     [H,detZ] = calH(imuNominalStates{state_k+1}.q,  measurements{state_k+1});
     P = imuErrorStates{state_k+1}.P;
+    P_save(:,:,state_k) = P;
     % Calculate Kalman gain
     K = (P*H') / ( H*P*H' + noiseParams.R); 
     % State correction
     det_x =  K * detZ;
+    tp(:,state_k) = det_x;
     imuErrorStates{state_k+1}.det_theta = det_x(1:3);
     imuErrorStates{state_k+1}.det_wb    = det_x(4:6);
     % Covariance correction
@@ -52,7 +55,7 @@ for state_k = 1:length-1
   %% ==========================STATE CORRECTION======================== %%
     det_q = buildUpdateQuat(imuErrorStates{state_k+1}.det_theta);                                       %it seems more safety to use this to update the euation q=[1 1/2*det_theta]
     imuNominalStates{state_k+1}.q  = quatLeftComp(imuNominalStates{state_k+1}.q)*det_q;                 %joan sola_Quaternion kinematics for the error_state KF p24
-    imuNominalStates{state_k+1}.q  = imuNominalStates{state_k+1}.q /norm(imuNominalStates{state_k+1}.q ); 
+    imuNominalStates{state_k+1}.q  = imuNominalStates{state_k+1}.q /norm(imuNominalStates{state_k+1}.q ); %%πÈ“ªªØ
     imuNominalStates{state_k+1}.wb = imuNominalStates{state_k+1}.wb + imuErrorStates{state_k+1}.det_wb;
     [roll(state_k+1),pitch(state_k+1),yaw(state_k+1)] = quattoeuler(imuNominalStates{state_k+1}.q);     %transform the quaternion to euler for plot
     %% ==========================ERROR STATE RESET======================== %%
@@ -64,5 +67,16 @@ end
 % err_sigma(:,length)=err_sigma(:,end);
 toc
 plotFigure
+% % % % 
+tmp = sum(sum(P_save));
+tmp = reshape(tmp,1,16861);
+figure;plot(tmp);
 
+% % % 
+
+tp = tp';
+figure;plot(tp(:,1:3));
+legend 1 2 3 4 5 6
+
+save('mytest/data.mat','tp')
 
